@@ -82,12 +82,7 @@ console.log(multiply(2,1,2,3))
 
 function isValidEmail(email){
     let regex=/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-    if(regex.test(email)){
-        return true
-    }
-    else{
-        return false
-    }
+    return regex.test(email)
 }
 console.log(isValidEmail("hari@gmail.com"))
 console.log(isValidEmail("hari@gmail.com"))   // true
