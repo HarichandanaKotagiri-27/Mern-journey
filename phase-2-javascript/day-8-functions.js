@@ -156,3 +156,17 @@ function formatCurrency(amount, currency = "INR") {
 console.log(formatCurrency(1000));        // ₹1,000
 console.log(formatCurrency(1000, "USD")); // $1,000
 
+
+const users = [
+  { name: "Hari", age: 22 },
+  { name: "Priya", age: 25 },
+  { name: "Ravi", age: 28 }
+]
+
+// Add a new field to every user
+const usersWithRole = users.map(user => ({
+  ...user,
+  role: "member"
+}))
+
+console.log(usersWithRole)
