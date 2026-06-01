@@ -110,3 +110,4 @@ document.querySelector("#reset").addEventListener("click", () => {
   document.getElementById("totalTip").textContent = ""
   document.getElementById("totalBill").textContent = ""
 })
+
