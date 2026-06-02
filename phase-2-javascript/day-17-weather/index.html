@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather App</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>🌤️ Indian Cities Weather</h1>
+
+    <!-- City buttons -->
+    <div class="city-buttons">
+      <button class="city-btn active" data-city="vijayawada">Vijayawada</button>
+      <button class="city-btn" data-city="hyderabad">Hyderabad</button>
+      <button class="city-btn" data-city="bangalore">Bangalore</button>
+      <button class="city-btn" data-city="mumbai">Mumbai</button>
+      <button class="city-btn" data-city="delhi">Delhi</button>
+      <button class="city-btn" data-city="chennai">Chennai</button>
+    </div>
+
+    <!-- Weather display -->
+    <div class="weather-card" id="weather-display">
+      <p id="loading">Loading weather...</p>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
