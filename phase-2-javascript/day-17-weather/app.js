@@ -1,3 +1,19 @@
+
+class NetworkError extends Error {
+  constructor(message) {
+    super(message)
+    this.name = "NetworkError"
+  }
+}
+
+class APIError extends Error {
+  constructor(status, message) {
+    super(message)
+    this.name = "APIError"
+    this.status = status
+  }
+}
+
 const cities = {
   vijayawada: { lat: 16.5,  lon: 80.6  },
   hyderabad:  { lat: 17.38, lon: 78.47 },
@@ -39,25 +55,70 @@ function showError(message) {
 
 async function fetchWeather(cityName) {
   const city = cities[cityName]
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current_weather=true`
+
+  if (!city) {
+    showError("City not found")
+    return
+  }
 
   showLoading()
 
   try {
-    const response = await fetch(url)
+    const response = await fetch(
+      `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current_weather=true`
+    )
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch: ${response.status}`)
+      throw new APIError(response.status, `Server error: ${response.status}`)
     }
 
     const data = await response.json()
-    const weather = data.current_weather
 
-    displayWeather(cityName, weather)
+    if (!data.current_weather) {
+      throw new APIError(200, "Weather data missing from response")
+    }
+
+    displayWeather(cityName, data.current_weather)
 
   } catch (error) {
-    showError(`Could not load weather: ${error.message}`)
+    if (error instanceof APIError) {
+      showError(`API Error ${error.status}: ${error.message}`)
+    } else if (error.name === "TypeError") {
+      showError("Network error — check your connection")
+    } else {
+      showError(`Unexpected error: ${error.message}`)
+    }
   }
+}
+
+async function fetchWithRetry(url, maxRetries = 3) {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const response = await fetch(url)
+      if (!response.ok) throw new Error(`HTTP ${response.status}`)
+      return await response.json()
+    } catch (error) {
+      console.log(`Attempt ${attempt} failed: ${error.message}`)
+
+      if (attempt === maxRetries) {
+        throw new Error(`Failed after ${maxRetries} attempts: ${error.message}`)
+      }
+
+      // Wait before retrying — longer each time
+      await new Promise(resolve => setTimeout(resolve, attempt * 1000))
+    }
+  }
+}
+
+function fetchWithTimeout(url, timeoutMs = 5000) {
+  const timeoutPromise = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error("Request timed out")), timeoutMs)
+  )
+
+  return Promise.race([
+    fetch(url),
+    timeoutPromise
+  ])
 }
 
 function displayWeather(cityName, weather) {
@@ -89,3 +150,4 @@ cityButtons.forEach(button => {
 
 // Load Vijayawada on start
 fetchWeather("vijayawada")
+
